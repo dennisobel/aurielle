@@ -147,9 +147,9 @@ export default function Home() {
               <button key={item} className="nav-link" onClick={() => chooseCategory(item)}>{item}</button>
             ))}
           </nav>
-          <a href="#top" className="brand-lockup" aria-label="Rose and Aurelia home">
+          <a href="#top" className="brand-lockup" aria-label="Aurielle Jewels home">
             <span className="brand-mark">R<span>✦</span></span>
-            <span className="brand-name">Rose & Aurelia</span>
+            <span className="brand-name">Aurielle Jewels</span>
             <span className="brand-subtitle">Fine jewelry atelier</span>
           </a>
           <div className="flex items-center gap-1 sm:gap-2">
@@ -177,7 +177,7 @@ export default function Home() {
         <div className="fixed inset-0 z-50 bg-[#181716]/40 lg:hidden" onClick={() => setMobileMenu(false)}>
           <aside className="mobile-drawer" onClick={(event) => event.stopPropagation()}>
             <div className="flex items-center justify-between border-b border-[#dedbd4] pb-5">
-              <div className="brand-name text-lg">Rose & Aurelia</div>
+              <div className="brand-name text-lg">Aurielle Jewels</div>
               <button className="icon-button" onClick={() => setMobileMenu(false)} aria-label="Close menu"><X size={21} /></button>
             </div>
             <div className="flex flex-col gap-1 pt-7">
@@ -234,7 +234,7 @@ export default function Home() {
           <div className="container editorial-grid">
             <div className="editorial-image"><img src={productImages.editorial} alt="A close editorial detail of layered gold jewelry" /></div>
             <div className="editorial-copy">
-              <p className="eyebrow">The Rose &amp; Aurelia way</p>
+              <p className="eyebrow">The Aurielle Jewels way</p>
               <h2>Designed for<br /><em>your chapters.</em></h2>
               <p>We believe the best jewelry becomes part of your story. Each piece is considered, made to be worn often, and designed to gather a little meaning with time.</p>
               <button className="button-quiet" onClick={() => notify("Our story is coming soon")}>Read our story <ArrowRight size={16} /></button>
@@ -296,8 +296,8 @@ export default function Home() {
       </main>
 
       <footer className="site-footer">
-        <div className="container footer-top"><div className="footer-brand"><div className="brand-name">Rose &amp; Aurelia</div><p>Personal jewelry for the moments in between.</p><button className="footer-location" onClick={() => notify("Our Toronto atelier is opening soon")}><MapPin size={15} /> Toronto · Copenhagen · Online</button></div><div className="footer-links"><div><p>Explore</p><a href="#shop">Shop all</a><a href="#shop">New arrivals</a><a href="#story">Our story</a></div><div><p>Care</p><button onClick={() => notify("Care guide is coming soon")}>Jewelry care</button><button onClick={() => notify("Shipping details are coming soon")}>Shipping &amp; returns</button><button onClick={() => notify("Contact form is coming soon")}>Contact</button></div><div><p>Follow</p><a href="#top"><Instagram size={16} /> Instagram</a><button onClick={() => notify("Pinterest is coming soon")}>Pinterest</button></div></div></div>
-        <div className="container footer-bottom"><span>© 2026 Rose &amp; Aurelia</span><span>Made with intention</span><span>Privacy · Terms</span></div>
+        <div className="container footer-top"><div className="footer-brand"><div className="brand-name">Aurielle Jewels</div><p>Personal jewelry for the moments in between.</p><button className="footer-location" onClick={() => notify("Our Toronto atelier is opening soon")}><MapPin size={15} /> Toronto · Copenhagen · Online</button></div><div className="footer-links"><div><p>Explore</p><a href="#shop">Shop all</a><a href="#shop">New arrivals</a><a href="#story">Our story</a></div><div><p>Care</p><button onClick={() => notify("Care guide is coming soon")}>Jewelry care</button><button onClick={() => notify("Shipping details are coming soon")}>Shipping &amp; returns</button><button onClick={() => notify("Contact form is coming soon")}>Contact</button></div><div><p>Follow</p><a href="#top"><Instagram size={16} /> Instagram</a><button onClick={() => notify("Pinterest is coming soon")}>Pinterest</button></div></div></div>
+        <div className="container footer-bottom"><span>© 2026 Aurielle Jewels</span><span>Made with intention</span><span>Privacy · Terms</span></div>
       </footer>
 
       {toast && <div className="toast" role="status"><Sparkles size={15} /> {toast}</div>}
