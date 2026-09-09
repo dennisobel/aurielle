@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Link } from "wouter";
 import { useCart } from "@/contexts/CartContext";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const productImages = {
   ring: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=900&q=85",
@@ -159,6 +160,7 @@ export default function Home() {
             </label>
             <button className="icon-button md:hidden" aria-label="Search" onClick={() => document.getElementById("mobile-search")?.focus()}><Search size={19} /></button>
             <button className="icon-button hidden sm:inline-flex" aria-label="Account" onClick={() => notify("Account sign-in is coming soon")}><UserRound size={19} /></button>
+            <ThemeToggle />
             <button className="bag-button" aria-label={`Shopping bag, ${sharedBagCount || bagCount} items`} onClick={() => setDrawerOpen(true)}>
               <ShoppingBag size={19} />
               {(sharedBagCount || bagCount) > 0 && <span>{sharedBagCount || bagCount}</span>}
