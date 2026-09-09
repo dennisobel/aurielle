@@ -224,6 +224,13 @@ export default defineConfig({
     port: 3000,
     strictPort: false, // Will find next available port if 3000 is busy
     host: true,
+    // WebDev exposes the dev server through an HTTPS reverse proxy. Tell the
+    // Vite client to use the browser's public host and secure websocket port,
+    // rather than attempting ws://localhost:3000 from the remote browser.
+    hmr: {
+      protocol: "wss",
+      clientPort: 443,
+    },
     allowedHosts: [
       ".manuspre.computer",
       ".manus.computer",
