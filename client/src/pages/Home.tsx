@@ -9,7 +9,9 @@ import {
   Instagram,
   MapPin,
   Menu,
+  Bookmark,
   Search,
+  SlidersHorizontal,
   ShieldCheck,
   ShoppingBag,
   Sparkles,
@@ -77,6 +79,8 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [mobileMenu, setMobileMenu] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filterSearch, setFilterSearch] = useState("");
+  const [expandedFilters, setExpandedFilters] = useState({ category: true, material: true });
   const [favorites, setFavorites] = useState<number[]>([]);
   const [bagCount, setBagCount] = useState(0);
   const [toast, setToast] = useState("");
@@ -263,9 +267,11 @@ export default function Home() {
           </div>
           <div className={`shop-layout ${filtersOpen ? "filters-visible" : ""}`}>
             <aside className="filter-panel">
-              <div className="filter-heading"><span>Filter by</span><button onClick={() => { setSelectedMetals([]); setActiveCategory("All"); setSearch(""); setPage(1); }}>Clear all</button></div>
-              <div className="filter-group"><p>Category</p>{(["All", "Rings", "Earrings", "Necklaces", "Bracelets"] as Category[]).map((category) => <button key={category} className={activeCategory === category ? "selected" : ""} onClick={() => { setActiveCategory(category); setPage(1); }}>{category}<span>{category === "All" ? products.length : products.filter((product) => product.category === category).length}</span></button>)}</div>
-              <div className="filter-group"><p>Material</p>{(["18k Gold", "Sterling Silver", "Mixed Metal"] as Metal[]).map((metal) => <label key={metal} className="checkbox-row"><input type="checkbox" checked={selectedMetals.includes(metal)} onChange={() => toggleMetal(metal)} /><span className="fake-checkbox" />{metal}</label>)}</div>
+              <div className="filter-workspace-head"><div><span className="filter-eyebrow"><SlidersHorizontal size={13} /> Refine selection</span><h3>Filters</h3></div><div className="filter-head-actions"><button onClick={() => { setSelectedMetals([]); setActiveCategory("All"); setSearch(""); setFilterSearch(""); setPage(1); }}>Clear all</button><button onClick={() => notify("Filters saved to your preferences")}><Bookmark size={13} /> Save</button></div></div>
+              <label className="filter-search"><Search size={14} /><input value={filterSearch} onChange={(event) => setFilterSearch(event.target.value)} placeholder="Search filters" aria-label="Search filters" /></label>
+              {(activeCategory !== "All" || selectedMetals.length > 0) && <div className="active-filter-chips"><span className="active-chip-label">Active</span>{activeCategory !== "All" && <button onClick={() => setActiveCategory("All")}>{activeCategory}<X size={11} /></button>}{selectedMetals.map((metal) => <button key={metal} onClick={() => toggleMetal(metal)}>{metal}<X size={11} /></button>)}</div>}
+              <div className="filter-accordion"><button className="filter-accordion-trigger" onClick={() => setExpandedFilters((current) => ({ ...current, category: !current.category }))}><span><SlidersHorizontal size={15} /> Category <em>{activeCategory !== "All" ? "1 selected" : ""}</em></span><ChevronDown size={15} className={expandedFilters.category ? "rotate-180" : ""} /></button>{expandedFilters.category && <div className="filter-accordion-content">{(["All", "Rings", "Earrings", "Necklaces", "Bracelets"] as Category[]).filter((category) => category.toLowerCase().includes(filterSearch.toLowerCase())).map((category) => <button key={category} className={activeCategory === category ? "selected" : ""} onClick={() => { setActiveCategory(category); setPage(1); }}>{category}<span>{category === "All" ? products.length : products.filter((product) => product.category === category).length}</span></button>)}</div>}</div>
+              <div className="filter-accordion"><button className="filter-accordion-trigger" onClick={() => setExpandedFilters((current) => ({ ...current, material: !current.material }))}><span><Gem size={15} /> Material <em>{selectedMetals.length ? `${selectedMetals.length} selected` : ""}</em></span><ChevronDown size={15} className={expandedFilters.material ? "rotate-180" : ""} /></button>{expandedFilters.material && <div className="filter-accordion-content">{(["18k Gold", "Sterling Silver", "Mixed Metal"] as Metal[]).filter((metal) => metal.toLowerCase().includes(filterSearch.toLowerCase())).map((metal) => <label key={metal} className="checkbox-row"><input type="checkbox" checked={selectedMetals.includes(metal)} onChange={() => toggleMetal(metal)} /><span className="fake-checkbox" />{metal}</label>)}</div>}</div>
               <div className="filter-note"><Gem size={17} /><span>All stones are conflict-free and responsibly sourced.</span></div>
             </aside>
             <div className="product-area">
