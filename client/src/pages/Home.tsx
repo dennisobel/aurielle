@@ -17,6 +17,8 @@ import {
   UserRound,
   X,
 } from "lucide-react";
+import { Link } from "wouter";
+import { useCart } from "@/contexts/CartContext";
 
 const productImages = {
   ring: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=900&q=85",
@@ -77,6 +79,7 @@ export default function Home() {
   const [favorites, setFavorites] = useState<number[]>([]);
   const [bagCount, setBagCount] = useState(0);
   const [toast, setToast] = useState("");
+  const { addItem: addToSharedBag, itemCount: sharedBagCount, setDrawerOpen } = useCart();
   const perPage = 8;
 
   const notify = (message: string) => {
@@ -120,6 +123,8 @@ export default function Home() {
 
   const addToBag = (name: string) => {
     setBagCount((count) => count + 1);
+    const matched = products.find((product) => product.name === name);
+    if (matched) addToSharedBag(matched);
     notify(`${name} added to your bag`);
   };
 
@@ -154,9 +159,9 @@ export default function Home() {
             </label>
             <button className="icon-button md:hidden" aria-label="Search" onClick={() => document.getElementById("mobile-search")?.focus()}><Search size={19} /></button>
             <button className="icon-button hidden sm:inline-flex" aria-label="Account" onClick={() => notify("Account sign-in is coming soon")}><UserRound size={19} /></button>
-            <button className="bag-button" aria-label={`Shopping bag, ${bagCount} items`} onClick={() => notify(bagCount ? `${bagCount} item${bagCount === 1 ? "" : "s"} in your bag` : "Your bag is waiting for something special")}>
+            <button className="bag-button" aria-label={`Shopping bag, ${sharedBagCount || bagCount} items`} onClick={() => setDrawerOpen(true)}>
               <ShoppingBag size={19} />
-              {bagCount > 0 && <span>{bagCount}</span>}
+              {(sharedBagCount || bagCount) > 0 && <span>{sharedBagCount || bagCount}</span>}
             </button>
           </div>
         </div>
@@ -264,7 +269,7 @@ export default function Home() {
             <div className="product-area">
               {visibleProducts.length > 0 ? <div className="product-grid">
                 {visibleProducts.map((product, index) => <article key={product.id} className="product-card" style={{ animationDelay: `${index * 35}ms` }}>
-                  <div className="product-image-wrap"><img src={product.image} alt={product.name} /><div className="product-badges">{product.tag && <span>{product.tag}</span>}</div><button className={`favorite-button ${favorites.includes(product.id) ? "is-favorite" : ""}`} aria-label={`Save ${product.name}`} onClick={() => toggleFavorite(product.id)}><Heart size={17} fill={favorites.includes(product.id) ? "currentColor" : "none"} /></button><button className="quick-add" onClick={() => addToBag(product.name)}>Add to bag <ArrowUpRight size={14} /></button></div>
+                  <Link href="/product/the-mira-signet" className="product-image-wrap"><img src={product.image} alt={product.name} /><div className="product-badges">{product.tag && <span>{product.tag}</span>}</div><button className={`favorite-button ${favorites.includes(product.id) ? "is-favorite" : ""}`} aria-label={`Save ${product.name}`} onClick={(event) => { event.preventDefault(); toggleFavorite(product.id); }}><Heart size={17} fill={favorites.includes(product.id) ? "currentColor" : "none"} /></button><span className="quick-add" role="button" tabIndex={0} onClick={(event) => { event.preventDefault(); addToBag(product.name); }} onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); addToBag(product.name); } }}>Add to bag <ArrowUpRight size={14} /></span></Link>
                   <div className="product-info"><div><h3>{product.name}</h3><p>{product.category} · {product.metal}</p></div><strong>{formatPrice(product.price)}</strong></div>
                 </article>)}
               </div> : <div className="empty-state"><Sparkles size={22} /><h3>Nothing quite matches.</h3><p>Try a different search or clear your filters to browse the full collection.</p><button className="button-quiet" onClick={() => { setSelectedMetals([]); setActiveCategory("All"); setSearch(""); }}>Clear filters <ArrowRight size={15} /></button></div>}
