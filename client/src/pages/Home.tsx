@@ -129,7 +129,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#fbfaf7] text-[#181716]">
+    <div className="min-h-screen overflow-x-hidden bg-[#fcfbf8] text-[#151515]">
       <div className="announcement-bar">
         <div className="container flex items-center justify-center gap-2 text-center">
           <Sparkles size={12} strokeWidth={1.6} />
@@ -139,7 +139,7 @@ export default function Home() {
         </div>
       </div>
 
-      <header className="sticky top-0 z-40 border-b border-[#dedbd4]/80 bg-[#fbfaf7]/95 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-[#d8d0c2]/80 bg-[#fcfbf8]/95 backdrop-blur-xl">
         <div className="container flex h-[72px] items-center justify-between gap-4 lg:h-[82px]">
           <button className="icon-button lg:hidden" aria-label="Open menu" onClick={() => setMobileMenu(true)}><Menu size={21} /></button>
           <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary navigation">
@@ -174,9 +174,9 @@ export default function Home() {
       </header>
 
       {mobileMenu && (
-        <div className="fixed inset-0 z-50 bg-[#181716]/40 lg:hidden" onClick={() => setMobileMenu(false)}>
+        <div className="fixed inset-0 z-50 bg-[#151515]/40 lg:hidden" onClick={() => setMobileMenu(false)}>
           <aside className="mobile-drawer" onClick={(event) => event.stopPropagation()}>
-            <div className="flex items-center justify-between border-b border-[#dedbd4] pb-5">
+            <div className="flex items-center justify-between border-b border-[#d8d0c2] pb-5">
               <div className="brand-name text-lg">Aurielle Jewels</div>
               <button className="icon-button" onClick={() => setMobileMenu(false)} aria-label="Close menu"><X size={21} /></button>
             </div>
@@ -185,7 +185,7 @@ export default function Home() {
                 <button key={item} className="mobile-nav-link" onClick={() => { setMobileMenu(false); chooseCategory(item); }}>{item}<ArrowUpRight size={16} /></button>
               ))}
             </div>
-            <div className="mt-auto space-y-4 border-t border-[#dedbd4] pt-6 text-sm text-[#6b6861]">
+            <div className="mt-auto space-y-4 border-t border-[#d8d0c2] pt-6 text-sm text-[#6b6861]">
               <button className="flex items-center gap-3" onClick={() => notify("Account sign-in is coming soon")}><UserRound size={17} /> My account</button>
               <button className="flex items-center gap-3" onClick={() => notify("Concierge chat is coming soon")}><CircleHelp size={17} /> Ask our concierge</button>
             </div>
