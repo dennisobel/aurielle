@@ -1,4 +1,4 @@
-.filter-panel { min-width: 0; }
+.filter-panel { min-width: 0; padding: 18px 16px 16px !important; background: rgba(255,255,255,.36); }
 .filter-heading { min-height: 44px; padding-bottom: 12px !important; }
 .filter-heading span { font-family: "Cormorant Garamond", Georgia, serif; font-size: 22px; line-height: 1; }
 .filter-group { padding: 15px 0 !important; }
@@ -7,8 +7,9 @@
 .filter-note { padding-top: 15px !important; font-size: 10px !important; line-height: 1.45 !important; }
 @media (min-width: 1024px) {
   .shop-layout { grid-template-columns: 220px minmax(0, 1fr) !important; gap: 34px !important; }
-  .filter-panel { padding-right: 8px; }
+  .filter-panel { padding: 18px 16px 16px !important; }
 }
+.dark .filter-panel { background: #181818; box-shadow: inset 0 0 0 1px rgba(216,208,194,.08); }
 .dark .filter-heading span { color: #f2eadd; }
 .dark .filter-group button, .dark .filter-panel .checkbox-row { color: #c7bca9; }
 .dark .filter-group button.selected { color: #f2eadd; }
