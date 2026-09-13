@@ -1,0 +1,22 @@
+[build]
+  command = "pnpm build"
+  publish = "dist/public"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Proxy the storefront API to the Express router, bundled as a single function.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# Client-side routing: let the SPA handle any path that isn't a real static asset.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

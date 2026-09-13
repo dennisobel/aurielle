@@ -1,11 +1,19 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 
 export type CartProduct = {
-  id: number;
+  id: string;
   name: string;
   category: string;
-  metal: string;
+  manufacturer?: string;
   price: number;
+  currency: string;
   image: string;
   quantity: number;
 };
@@ -15,13 +23,12 @@ type CartContextValue = {
   isDrawerOpen: boolean;
   setDrawerOpen: (open: boolean) => void;
   addItem: (product: Omit<CartProduct, "quantity">) => void;
-  removeItem: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  removeItem: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   itemCount: number;
   subtotal: number;
-  shipping: number;
-  total: number;
+  currency: string;
 };
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
@@ -43,23 +50,49 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [items]);
 
   const addItem = (product: Omit<CartProduct, "quantity">) => {
-    setItems((current) => {
-      const existing = current.find((item) => item.id === product.id);
+    setItems(current => {
+      const existing = current.find(item => item.id === product.id);
       return existing
-        ? current.map((item) => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item)
+        ? current.map(item =>
+            item.id === product.id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          )
         : [...current, { ...product, quantity: 1 }];
     });
     setDrawerOpen(true);
   };
-  const removeItem = (id: number) => setItems((current) => current.filter((item) => item.id !== id));
-  const updateQuantity = (id: number, quantity: number) => quantity <= 0 ? removeItem(id) : setItems((current) => current.map((item) => item.id === id ? { ...item, quantity } : item));
+  const removeItem = (id: string) =>
+    setItems(current => current.filter(item => item.id !== id));
+  const updateQuantity = (id: string, quantity: number) =>
+    quantity <= 0
+      ? removeItem(id)
+      : setItems(current =>
+          current.map(item => (item.id === id ? { ...item, quantity } : item))
+        );
   const clearCart = () => setItems([]);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const shipping = subtotal === 0 || subtotal >= 150 ? 0 : 12;
-  const total = subtotal + shipping;
+  const subtotal = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  const currency = items[0]?.currency ?? "USD";
 
-  const value = useMemo(() => ({ items, isDrawerOpen, setDrawerOpen, addItem, removeItem, updateQuantity, clearCart, itemCount, subtotal, shipping, total }), [items, isDrawerOpen, itemCount, subtotal, shipping, total]);
+  const value = useMemo(
+    () => ({
+      items,
+      isDrawerOpen,
+      setDrawerOpen,
+      addItem,
+      removeItem,
+      updateQuantity,
+      clearCart,
+      itemCount,
+      subtotal,
+      currency,
+    }),
+    [items, isDrawerOpen, itemCount, subtotal, currency]
+  );
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 

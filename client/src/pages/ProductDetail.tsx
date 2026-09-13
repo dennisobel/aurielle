@@ -1,24 +1,236 @@
-import { useState } from "react";
-import { ArrowLeft, ArrowRight, Check, ChevronDown, Heart, Minus, Plus, ShieldCheck, Truck } from "lucide-react";
-import { Link, useLocation } from "wouter";
+import { useEffect, useState } from "react";
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  ChevronDown,
+  Heart,
+  Loader2,
+  Minus,
+  Plus,
+  ShieldCheck,
+  Truck,
+} from "lucide-react";
+import { Link, useParams } from "wouter";
+import type { NuruProduct } from "@shared/nuru";
 import StoreHeader from "@/components/StoreHeader";
 import CartDrawer from "@/components/CartDrawer";
 import { useCart } from "@/contexts/CartContext";
-
-const images = [
-  "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=85",
-  "https://images.unsplash.com/photo-1611652022419-a9419f74343d?auto=format&fit=crop&w=1200&q=85",
-  "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1200&q=85",
-];
+import { formatMoney } from "@/lib/money";
+import * as nuruApi from "@/lib/nuru";
+import { ApiError } from "@/lib/nuru";
+import { productImage } from "@/lib/placeholder";
 
 export default function ProductDetail() {
-  const [, navigate] = useLocation();
+  const { id } = useParams<{ id: string }>();
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [activeImage, setActiveImage] = useState(0);
-  const [metal, setMetal] = useState("18k Gold");
   const [saved, setSaved] = useState(false);
-  const product = { id: 1, name: "The Mira Signet", category: "Rings", metal, price: 485, image: images[0] };
-  const add = () => { for (let index = 0; index < quantity; index += 1) addItem(product); };
-  return <div className="min-h-screen bg-[#fcfbf8] text-[#151515]"><StoreHeader /><main className="container detail-page"><Link href="/" className="back-link"><ArrowLeft size={15} /> Back to collection</Link><div className="detail-layout"><section className="detail-gallery"><div className="detail-main-image"><img src={images[activeImage]} alt={product.name} /><span className="detail-image-count">0{activeImage + 1} / 03</span></div><div className="detail-thumbnails">{images.map((image, index) => <button key={image} className={activeImage === index ? "active" : ""} onClick={() => setActiveImage(index)}><img src={image} alt={`${product.name} view ${index + 1}`} /></button>)}</div></section><section className="detail-copy"><div className="detail-kicker"><span>New arrival</span><span>Hand-finished</span></div><h1>{product.name}</h1><div className="detail-rating"><span>★★★★★</span><u>12 considered reviews</u></div><p className="detail-price">$485 <small>USD</small></p><p className="detail-lede">A softly sculpted signet with a grounding weight. Made to be worn daily, and to collect the beautiful marks of a life well lived.</p><div className="detail-options"><div className="option-heading"><span>Metal</span><strong>{metal}</strong></div><div className="metal-options">{["18k Gold", "Sterling Silver", "Mixed Metal"].map((item) => <button key={item} className={metal === item ? "selected" : ""} onClick={() => setMetal(item)}><span className={`metal-swatch ${item.toLowerCase().replace(" ", "-")}`} />{item}{metal === item && <Check size={14} />}</button>)}</div></div><div className="detail-purchase"><div className="quantity-control"><button onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Decrease quantity"><Minus size={13} /></button><span>{quantity}</span><button onClick={() => setQuantity(quantity + 1)} aria-label="Increase quantity"><Plus size={13} /></button></div><button className="button-primary detail-add" onClick={add}>Add to bag <ArrowRight size={16} /></button><button className={`detail-save ${saved ? "saved" : ""}`} onClick={() => setSaved(!saved)} aria-label="Save to wishlist"><Heart size={19} fill={saved ? "currentColor" : "none"} /></button></div><div className="detail-promises"><div><Truck size={18} /><span><strong>Complimentary delivery</strong>Arrives in 2–4 business days</span></div><div><ShieldCheck size={18} /><span><strong>Lifetime care included</strong>Repair, resize, refresh</span></div></div><div className="detail-accordions"><details open><summary>Details <ChevronDown size={16} /></summary><p>Solid 18k recycled gold, ethically sourced diamond accents, hand-polished finish. 14mm face. Made in our Toronto atelier.</p></details><details><summary>Shipping &amp; returns <ChevronDown size={16} /></summary><p>Complimentary shipping over $150. Return or exchange within 30 days of delivery.</p></details><details><summary>Care guide <ChevronDown size={16} /></summary><p>Store in the provided pouch and remove before swimming, showering, or applying perfume.</p></details></div></section></div><section className="detail-story"><div><p className="eyebrow">Why it stays</p><h2>The piece you<br /><em>reach for first.</em></h2></div><p>There is a certain ease to a signet. The Mira is our take on an old-world silhouette — softened at every edge, scaled for today, and made to become unmistakably yours.</p></section></main><CartDrawer /></div>;
+  const [product, setProduct] = useState<NuruProduct | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError("");
+    nuruApi
+      .getProduct(id)
+      .then(data => {
+        if (!cancelled) {
+          setProduct(data);
+          setQuantity(Math.max(1, data.moq || 1));
+        }
+      })
+      .catch(err => {
+        if (!cancelled)
+          setError(
+            err instanceof ApiError
+              ? err.message
+              : "Couldn't load this product."
+          );
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  if (loading)
+    return (
+      <div className="min-h-screen bg-[#fcfbf8] text-[#151515]">
+        <StoreHeader />
+        <main className="container detail-page">
+          <div className="empty-state">
+            <Loader2 size={22} className="animate-spin" />
+            <h3>Loading…</h3>
+          </div>
+        </main>
+      </div>
+    );
+
+  if (error || !product)
+    return (
+      <div className="min-h-screen bg-[#fcfbf8] text-[#151515]">
+        <StoreHeader />
+        <main className="container detail-page">
+          <Link href="/" className="back-link">
+            <ArrowLeft size={15} /> Back to collection
+          </Link>
+          <div className="empty-state">
+            <AlertTriangle size={22} />
+            <h3>Couldn't load this product.</h3>
+            <p>{error || "It may no longer be available."}</p>
+          </div>
+        </main>
+      </div>
+    );
+
+  const add = () => {
+    for (let index = 0; index < quantity; index += 1)
+      addItem({
+        id: product.id,
+        name: product.name,
+        category: product.category,
+        manufacturer: product.manufacturer,
+        price: product.price,
+        currency: product.currency,
+        image: productImage(product.image_url),
+      });
+  };
+
+  return (
+    <div className="min-h-screen bg-[#fcfbf8] text-[#151515]">
+      <StoreHeader />
+      <main className="container detail-page">
+        <Link href="/" className="back-link">
+          <ArrowLeft size={15} /> Back to collection
+        </Link>
+        <div className="detail-layout">
+          <section className="detail-gallery">
+            <div className="detail-main-image">
+              <img src={productImage(product.image_url)} alt={product.name} />
+            </div>
+          </section>
+          <section className="detail-copy">
+            <div className="detail-kicker">
+              <span>{product.category}</span>
+              {product.manufacturer && <span>{product.manufacturer}</span>}
+            </div>
+            <h1>{product.name}</h1>
+            <p className="detail-price">
+              {formatMoney(product.price, product.currency)}
+            </p>
+            {!product.in_stock ? (
+              <p className="detail-lede" style={{ color: "#b3452f" }}>
+                Currently out of stock.
+              </p>
+            ) : (
+              product.stock_level === "low_stock" && (
+                <p className="detail-lede" style={{ color: "#b3452f" }}>
+                  Low stock — order soon.
+                </p>
+              )
+            )}
+            <p className="detail-lede">
+              {product.description ||
+                "No description available for this item yet."}
+            </p>
+            {product.sku && <p className="detail-lede">SKU: {product.sku}</p>}
+            {product.moq > 1 && (
+              <p className="detail-lede">
+                Minimum order quantity: {product.moq}
+              </p>
+            )}
+            {product.price_bands?.length > 0 && (
+              <div className="detail-options">
+                <div className="option-heading">
+                  <span>Volume pricing</span>
+                </div>
+                <div className="summary-rows">
+                  {product.price_bands.map(band => (
+                    <div key={band.min_qty}>
+                      <span>
+                        {band.min_qty}
+                        {band.max_qty ? `–${band.max_qty}` : "+"} units
+                      </span>
+                      <strong>
+                        {formatMoney(band.unit_price, product.currency)} each
+                      </strong>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <div className="detail-purchase">
+              <div className="quantity-control">
+                <button
+                  onClick={() =>
+                    setQuantity(Math.max(product.moq || 1, quantity - 1))
+                  }
+                  aria-label="Decrease quantity"
+                >
+                  <Minus size={13} />
+                </button>
+                <span>{quantity}</span>
+                <button
+                  onClick={() => setQuantity(quantity + 1)}
+                  aria-label="Increase quantity"
+                >
+                  <Plus size={13} />
+                </button>
+              </div>
+              <button
+                className="button-primary detail-add"
+                onClick={add}
+                disabled={!product.in_stock}
+              >
+                {product.in_stock ? "Add to bag" : "Out of stock"}{" "}
+                <ArrowRight size={16} />
+              </button>
+              <button
+                className={`detail-save ${saved ? "saved" : ""}`}
+                onClick={() => setSaved(!saved)}
+                aria-label="Save to wishlist"
+              >
+                <Heart size={19} fill={saved ? "currentColor" : "none"} />
+              </button>
+            </div>
+            <div className="detail-promises">
+              <div>
+                <Truck size={18} />
+                <span>
+                  <strong>Reliable delivery</strong>Tracked from order to door
+                </span>
+              </div>
+              <div>
+                <ShieldCheck size={18} />
+                <span>
+                  <strong>Secure checkout</strong>Every order is protected
+                </span>
+              </div>
+            </div>
+            {product.attributes &&
+              Object.keys(product.attributes).length > 0 && (
+                <div className="detail-accordions">
+                  <details open>
+                    <summary>
+                      Details <ChevronDown size={16} />
+                    </summary>
+                    <p>
+                      {Object.entries(product.attributes)
+                        .map(([key, value]) => `${key}: ${value}`)
+                        .join(" · ")}
+                    </p>
+                  </details>
+                </div>
+              )}
+          </section>
+        </div>
+      </main>
+      <CartDrawer />
+    </div>
+  );
 }
